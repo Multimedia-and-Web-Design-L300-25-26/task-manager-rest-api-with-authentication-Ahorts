@@ -1,5 +1,20 @@
 import request from "supertest";
+import mongoose from "mongoose";
+import connectDB from "../src/config/db.js";
 import app from "../src/app.js";
+
+beforeAll(async () => {
+  await connectDB();
+});
+
+afterAll(async () => {
+  // Clean up test users
+  const collections = await mongoose.connection.db.collections();
+  for (const collection of collections) {
+    await collection.deleteMany({});
+  }
+  await mongoose.disconnect();
+});
 
 describe("Auth Routes", () => {
 

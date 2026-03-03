@@ -1,10 +1,14 @@
 import request from "supertest";
+import mongoose from "mongoose";
+import connectDB from "../src/config/db.js";
 import app from "../src/app.js";
 
 let token;
 let taskId;
 
 beforeAll(async () => {
+  await connectDB();
+
   // Register
   await request(app)
     .post("/api/auth/register")
@@ -23,6 +27,14 @@ beforeAll(async () => {
     });
 
   token = res.body.token;
+});
+
+afterAll(async () => {
+  const collections = await mongoose.connection.db.collections();
+  for (const collection of collections) {
+    await collection.deleteMany({});
+  }
+  await mongoose.disconnect();
 });
 
 describe("Task Routes", () => {
